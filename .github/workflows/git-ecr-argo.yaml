@@ -44,19 +44,13 @@ jobs:
       uses: actions/checkout@v2
       with:
         token: ${{ secrets.GIT_TO_GIT }}
-        fetch-depth: 0  # Ensure the full history is fetched
-
-    - name: Configure Git
-      run: |
-        git config --global user.email "hoseop4018@naver.com"
-        git config --global user.name "sbgyhs"
 
     - name: Add and Push to Argo repository
       run: |
         git remote add argo https://github.com/sbgyhs/Argo.git
         git fetch argo
         git checkout main
-        git merge argo/main --allow-unrelated-histories || git merge --strategy-option theirs argo/main --allow-unrelated-histories
+        git merge argo/main --allow-unrelated-histories --strategy-option theirs || true
         git push argo main
       env:
         GH_TOKEN: ${{ secrets.GIT_TO_GIT }}
