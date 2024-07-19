@@ -49,7 +49,7 @@ jobs:
     - name: Pushes to another repository
       uses: cpina/github-action-push-to-another-repository@main
       env:
-          GIT_TO_GIT: ${{ secrets.GIT_TO_GIT }}
+          GIT_TO_GIT: ${{ secrets.Deploy-key }}
       with:
           source-directory: 'git-ecr-argo'
           destination-github-username: 'sbgyhs'
