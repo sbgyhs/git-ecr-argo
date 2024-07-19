@@ -50,7 +50,7 @@ jobs:
 
     - name: Push to Argo repository
       run: |
-        git remote add argo https://github.com/username/Argo.git
+        git remote add argo https://github.com/sbgyhs/Argo.git
         git push argo main
       env:
         GH_TOKEN: ${{ secrets.GIT_TO_GIT }}
