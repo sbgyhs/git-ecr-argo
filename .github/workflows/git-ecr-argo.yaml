@@ -48,8 +48,8 @@ jobs:
 
     - name: Configure Git
       run: |
-        git config --global user.email "actions@github.com"
-        git config --global user.name "GitHub Actions"
+        git config --global user.email "hoseop4018@naver.com"
+        git config --global user.name "sbgyhs"
 
     - name: Add and Push to Argo repository
       run: |
