@@ -46,6 +46,13 @@ jobs:
     - name: creates output
       run:  sh ./build.sh
 
+    - name: Push Docker image to GitHub repository
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: ghcr.io/sbgyhs/Argo:${{ github.sha }}
+
     - name: Pushes to another repository
       uses: cpina/github-action-push-to-another-repository@main
       env:
