@@ -14,7 +14,7 @@ env:
   GITHUB_REPO: Argo
   DOCKERHUB_ID: yhs0728
   DOCKERHUB_REPO: mywebapp
-  BUILD_NUMBER: ${{ github.run_number }}  # Jenkins의 빌드 번호 대신 GitHub Actions의 실행 번호 사용
+  BUILD_NUMBER: ${{ github.run_number }}  # GitHub Actions의 실행 번호 사용
 
 jobs:
   deploy:
@@ -57,35 +57,26 @@ jobs:
         git config user.name "${{ env.GITHUB_USER }}"
         git config user.email "${{ env.GITHUB_EMAIL }}"
 
-    - name: Add and Push to Argo repository
+    - name: Update Kubernetes manifests & Push to Argo repository
       run: |
-        git remote add argo https://github.com/${{ env.GITHUB_ID }}/${{ env.GITHUB_REPO }}.git
-        git fetch argo
-        git checkout main
-        git merge argo/main --allow-unrelated-histories --strategy-option theirs || true
-        git push argo main
+        docker run --rm \
+          -e GITHUB_USER="${{ env.GITHUB_USER }}" \
+          -e GITHUB_EMAIL="${{ env.GITHUB_EMAIL }}" \
+          -e GITHUB_ID="${{ env.GITHUB_ID }}" \
+          -e GITHUB_REPO="${{ env.GITHUB_REPO }}" \
+          -e DOCKERHUB_ID="${{ env.DOCKERHUB_ID }}" \
+          -e DOCKERHUB_REPO="${{ env.DOCKERHUB_REPO }}" \
+          -e BUILD_NUMBER="${{ env.BUILD_NUMBER }}" \
+          -v ${{ github.workspace }}:/workspace \
+          alpine/git sh -c "
+          git config --global user.name \"${GITHUB_USER}\"
+          git config --global user.email \"${GITHUB_EMAIL}\"
+          cd /workspace
+          sed -i \"s/image:.*/image: ${DOCKERHUB_ID}\/${DOCKERHUB_REPO}:${BUILD_NUMBER}/g\" deployment.yaml
+          git add deployment.yaml
+          git commit -m \"Update deployment.yaml with image tag ${BUILD_NUMBER}\"
+          git push origin main
+          "
       env:
         GH_TOKEN: ${{ secrets.GIT_TO_GIT }}
 
-  update-k8s-manifests-and-push:
-    name: Update K8s Manifests & Push
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout Argo repository
-      uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.GIT_TO_GIT }}
-
-    - name: Configure Git user
-      run: |
-        git config user.name "${{ env.GITHUB_USER }}"
-        git config user.email "${{ env.GITHUB_EMAIL }}"
-
-    - name: Update Kubernetes manifests
-      run: |
-        sed -i "s/image:.*/image: ${{ env.DOCKERHUB_ID }}\/${{ env.DOCKERHUB_REPO }}:${{ env.BUILD_NUMBER }}/g" deployment.yaml
-        git add deployment.yaml
-        git commit -m "Update deployment.yaml with image tag ${BUILD_NUMBER}"
-        git push origin main
-      env:
-        GH_TOKEN: ${{ secrets.GIT_TO_GIT }}
