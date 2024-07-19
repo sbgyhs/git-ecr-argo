@@ -51,7 +51,7 @@ jobs:
       env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-          source-directory: './'
+          source-directory: '.github/workflows'
           destination-github-username: 'sbgyhs'
           destination-repository-name: 'Argo'
           user-email: hoseop4018@naver.com
