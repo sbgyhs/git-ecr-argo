@@ -1,46 +1,52 @@
-name: Build and Push Docker Images to ECR
+name: Build, Tag, and Push Docker Images to Amazon ECR
 
 on:
   push:
     branches:
       - main
-    paths:
-      - 'Collection of Dockerfiles/Dockerfile.*'
-
-env:
-  AWS_REGION: us-east-1
-  ECR_REPOSITORY: skylo-ecr
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: us-east-1  # 직접 지역 값을 설정
 
     - name: Log in to Amazon ECR
-      id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+      with:
+        region: us-east-1  # 직접 지역 값을 설정
 
-    - name: Build and Push Docker Images
+    - name: Build, tag, and push all Docker images to Amazon ECR
+      env:
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        for DOCKERFILE in Collection\ of\ Dockerfiles/Dockerfile.*; do
-          if [ -f "$DOCKERFILE" ]; then
-            IMAGE_TAG=$(basename "$DOCKERFILE" | sed 's/^Dockerfile.//')
-            IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
-            echo "Building Docker image from $DOCKERFILE..."
-            docker build -f "$DOCKERFILE" -t "$IMAGE_URI" .
-            echo "Pushing Docker image to $IMAGE_URI..."
-            docker push "$IMAGE_URI"
-          else
-            echo "Warning: $DOCKERFILE does not exist."
-          fi
+        # ECR Registry and Repository values
+        ECR_REGISTRY="your-ecr-registry-id.dkr.ecr.us-east-1.amazonaws.com"  # 직접 ECR Registry 값 설정
+        ECR_REPOSITORY="your-ecr-repository-name"  # 직접 ECR Repository 값 설정
+
+        # Find all Dockerfile.* files and process them
+        for DOCKERFILE in $(find . -type f -name 'Dockerfile.*'); do
+          # Extract the base name of the Dockerfile to use as the image tag
+          BASE_NAME=$(basename $DOCKERFILE)
+          IMAGE_NAME="${BASE_NAME#Dockerfile.}"
+          
+          echo "Processing Dockerfile: $DOCKERFILE"
+          
+          # Build the Docker image
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG -f $DOCKERFILE .
+          
+          # Push the Docker image to ECR
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG
+          
+          # Optionally, set output variable for subsequent steps
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG" >> $GITHUB_ENV
         done
