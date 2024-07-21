@@ -31,7 +31,7 @@ jobs:
       run: |
         # ECR Registry and Repository values
         ECR_REGISTRY="your-ecr-registry-id.dkr.ecr.us-east-1.amazonaws.com"  # 직접 ECR Registry 값 설정
-        ECR_REPOSITORY="your-ecr-repository-name"  # 직접 ECR Repository 값 설정
+        ECR_REPOSITORY="skylo-ecr"  # 직접 ECR Repository 값 설정
 
         # Find all Dockerfile.* files and process them
         for DOCKERFILE in $(find . -type f -name 'Dockerfile.*'); do
