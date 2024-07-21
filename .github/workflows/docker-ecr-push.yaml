@@ -2,8 +2,10 @@ name: docker-ecr-push
 
 on:
   push:
+    branches:
+      - main
     paths:
-      - '**/Dockerfile.*'  # 모든 Dockerfile 관련 파일을 감지
+      - 'Collection of Dockerfiles/Dockerfile.*'  # 모든 Dockerfile 관련 파일을 감지
 
 env:
   AWS_REGION: us-east-1                # AWS 지역 설정
