@@ -2,8 +2,10 @@ name: Dockerizing to Amazon ECR
 
 on:
   push:
+    branches:
+      - main
     paths:
-      - '**/Dockerfile'  # 모든 Dockerfile 관련 파일을 감지
+      - 'Collection of Dockerfiles/Dockerfile.*'  # 모든 Dockerfile 관련 파일을 감지
       
 env:
   AWS_REGION: us-east-1        # set this to your preferred AWS region, e.g. us-west-1
