@@ -37,11 +37,11 @@ jobs:
         IMAGE_TAG: ${{ github.sha }}
       run: |
         # Find the changed Dockerfiles
-        CHANGED_DOCKERFILES=$(git diff --name-only HEAD^ HEAD | grep '^Collection of Dockerfiles/.*Dockerfile*' || true)
+        CHANGED_DOCKERFILES=$(git diff --name-only HEAD^ HEAD | grep '^Collection of Dockerfiles/.*Dockerfile.*' || true)
 
         # Check if there are any Dockerfile changes
         if [ -z "$CHANGED_DOCKERFILES" ]; then
-          echo "No Dockerfile changes detected. Skipping build and push."
+          echo "No Dockerfile.* changes detected. Skipping build and push."
           exit 0
         fi
 
