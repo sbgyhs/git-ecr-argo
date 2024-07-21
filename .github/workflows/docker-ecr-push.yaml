@@ -2,8 +2,8 @@ name: Build, Tag, and Push Docker Images to Amazon ECR
 
 on:
   push:
-    paths:
-      - "Collection of Dockerfiles/**"
+    branches:
+      - main
 
 jobs:
   build-and-push:
