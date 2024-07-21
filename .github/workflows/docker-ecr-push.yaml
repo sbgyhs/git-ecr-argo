@@ -33,7 +33,7 @@ jobs:
         ECR_REPOSITORY: "skylo-ecr"  # ECR 리포지토리 이름을 코드에 직접 포함
       run: |
         # Find all Dockerfile.* files and process them
-        for DOCKERFILE in $(find Collection of Dockerfiles -type f -name 'Dockerfile.*'); do
+        for DOCKERFILE in $(find ./ -type f -name 'Dockerfile.*'); do
           # Extract the base name of the Dockerfile to use as the image tag
           BASE_NAME=$(basename $DOCKERFILE)
           IMAGE_NAME="${BASE_NAME#Dockerfile.}"
