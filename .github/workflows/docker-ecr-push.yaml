@@ -7,7 +7,7 @@ on:
 
 env:
   AWS_REGION: us-east-1                # AWS 지역 설정
-  ECR_REPOSITORY: skylo-ecr    # ECR 리포지토리 이름
+  ECR_REPOSITORY: my-ecr-repository    # ECR 리포지토리 이름
 
 jobs:
   build_and_push:
