@@ -6,8 +6,9 @@ on:
       - main
     paths:
       - 'Collection of Dockerfiles/Dockerfile.*'
+
 env:
-  AWS_REGION: us-east-1        # set this to your preferred AWS region, e.g. us-west-1
+  AWS_REGION: us-east-1
   ECR_REPOSITORY: skylo-ecr
 
 jobs:
@@ -32,9 +33,14 @@ jobs:
     - name: Build and Push Docker Images
       run: |
         for DOCKERFILE in Collection\ of\ Dockerfiles/Dockerfile.*; do
-          IMAGE_TAG=$(basename $DOCKERFILE | sed 's/^Dockerfile.//')
-          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-repo:$IMAGE_TAG
-          docker build -f $DOCKERFILE -t $IMAGE_URI .
-          docker push $IMAGE_URI
+          if [ -f "$DOCKERFILE" ]; then
+            IMAGE_TAG=$(basename "$DOCKERFILE" | sed 's/^Dockerfile.//')
+            IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+            echo "Building Docker image from $DOCKERFILE..."
+            docker build -f "$DOCKERFILE" -t "$IMAGE_URI" .
+            echo "Pushing Docker image to $IMAGE_URI..."
+            docker push "$IMAGE_URI"
+          else
+            echo "Warning: $DOCKERFILE does not exist."
+          fi
         done
-
