@@ -1,0 +1,57 @@
+name: Dockerizing to Amazon ECR
+
+on:
+  push:
+    paths:
+      - 'Collection of Dockerfiles/**/Dockerfile*'  # 모든 Dockerfile 관련 파일을 감지
+
+env:
+  AWS_REGION: us-east-1                # AWS 지역 설정
+  ECR_REPOSITORY: my-ecr-repository     # ECR 리포지토리 이름
+
+jobs:
+  build_and_push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS Access Key
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS Secret Key
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push Docker images
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Find the changed Dockerfiles
+        CHANGED_DOCKERFILES=$(git diff --name-only HEAD^ HEAD | grep '^Collection of Dockerfiles/.*Dockerfile*' || true)
+
+        # Check if there are any Dockerfile changes
+        if [ -z "$CHANGED_DOCKERFILES" ]; then
+          echo "No Dockerfile changes detected. Skipping build and push."
+          exit 0
+        fi
+
+        for DOCKERFILE in $CHANGED_DOCKERFILES; do
+          # Extract the directory name and use it to tag the image
+          DIR_NAME=$(dirname $DOCKERFILE | sed 's/^Collection of Dockerfiles\///')
+          IMAGE_TAG="$ECR_REGISTRY/$ECR_REPOSITORY/${DIR_NAME//\//-}:$IMAGE_TAG"
+
+          echo "Building and pushing image for $DOCKERFILE"
+          docker build -f $DOCKERFILE -t $IMAGE_TAG .
+          docker push $IMAGE_TAG
+        done
+
