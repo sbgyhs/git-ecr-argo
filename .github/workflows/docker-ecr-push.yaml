@@ -28,11 +28,9 @@ jobs:
     - name: Build, tag, and push all Docker images to Amazon ECR
       env:
         IMAGE_TAG: ${{ github.sha }}
+        ECR_REGISTRY: "058264317535.dkr.ecr.us-east-1.amazonaws.com"  # ECR 레지스트리 URL을 코드에 직접 포함
+        ECR_REPOSITORY: "skylo-ecr"  # ECR 리포지토리 이름을 코드에 직접 포함
       run: |
-        # ECR Registry and Repository values
-        ECR_REGISTRY="your-ecr-registry-id.dkr.ecr.us-east-1.amazonaws.com"  # 직접 ECR Registry 값 설정
-        ECR_REPOSITORY="skylo-ecr"  # 직접 ECR Repository 값 설정
-
         # Find all Dockerfile.* files and process them
         for DOCKERFILE in $(find . -type f -name 'Dockerfile.*'); do
           # Extract the base name of the Dockerfile to use as the image tag
