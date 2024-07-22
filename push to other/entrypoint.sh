@@ -48,7 +48,7 @@ then
 
 elif [ -n "${SKYLO_REPO:=}" ]
 then
-	echo "[+] Using API_TOKEN_GITHUB"
+	echo "[+] Using SKYLO_REPO"
 	GIT_CMD_REPOSITORY="https://$DESTINATION_REPOSITORY_USERNAME:$SKYLO_REPO@$GITHUB_SERVER/$DESTINATION_REPOSITORY_USERNAME/$DESTINATION_REPOSITORY_NAME.git"
 else
 	echo "::error::API_TOKEN_GITHUB and SSH_DEPLOY_KEY are empty. Please fill one (recommended the SSH_DEPLOY_KEY)"
