@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+env:
+  API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+
+
 jobs:
   push:
     runs-on: ubuntu-latest
