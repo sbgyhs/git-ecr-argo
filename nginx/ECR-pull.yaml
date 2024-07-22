@@ -11,10 +11,10 @@ spec:
         command: ["sh", "-c"]
         args:
           - |
-            sudo yum install -y curl && \
+            yum install -y curl && \
             curl -LO "https://dl.k8s.io/release/v1.25.0/bin/linux/amd64/kubectl" && \
-            sudo chmod +x ./kubectl && \
-            sudo mv ./kubectl /usr/local/bin/kubectl && \
+            chmod +x ./kubectl && \
+            mv ./kubectl /usr/local/bin/kubectl && \
             PASSWORD=$(aws ecr get-login-password --region us-east-1) && \
             kubectl create secret docker-registry ecr-secret \
               --docker-server=058264317535.dkr.ecr.us-east-1.amazonaws.com \
