@@ -33,7 +33,7 @@ jobs:
         user-name: 'sbgyhs'
         target-branch: 'main'
         commit-message: 'Update from origin repository'
-        target-directory: ''
+        target-directory: 'nginx'
         create-target-branch-if-needed: true
 
         
