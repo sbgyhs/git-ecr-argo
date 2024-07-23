@@ -33,7 +33,7 @@ jobs:
         ECR_REPOSITORY: "skylo-ecr"  # ECR 리포지토리 이름을 코드에 직접 포함
       run: |
         # Find all Dockerfile.* files and process them
-        for DOCKERFILE in $(find "Collection_of_Dockerfiles" -type f -name 'Dockerfile.*'); do
+        for DOCKERFILE in $(find . -type f -name 'Dockerfile.*'); do
           # Extract the base name of the Dockerfile to use as the image tag
           BASE_NAME=$(basename $DOCKERFILE)
           IMAGE_NAME="${BASE_NAME#Dockerfile.}"
@@ -48,10 +48,4 @@ jobs:
           
           # Optionally, set output variable for subsequent steps
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG" >> $GITHUB_ENV
-        done < <(find "Collection_of_Dockerfiles" -type f -name 'Dockerfile.*')
-
-    env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      ECR_REGISTRY: "058264317535.dkr.ecr.us-east-1.amazonaws.com"  # ECR 레지스트리 URL을 코드에 직접 포함
-      ECR_REPOSITORY: "skylo-ecr" 
-      IMAGE_TAG: ${{ github.sha }}
+        done
