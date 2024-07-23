@@ -26,7 +26,7 @@ jobs:
         run: |
           # Debug: List all Dockerfile.* files
           echo "Listing Dockerfile.* files:"
-          find "Collection of Dockerfiles" -type f -name 'Dockerfile.*'
+          find "Collection_of_Dockerfiles" -type f -name 'Dockerfile.*'
           
           # Process each Dockerfile
           while IFS= read -r DOCKERFILE; do
