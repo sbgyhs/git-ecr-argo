@@ -26,7 +26,7 @@ jobs:
       with:
         region: us-east-1  # 직접 지역 값을 설정
 
-    - name: Build, tag, and push all Docker images to Amazon ECR
+    - name:  Test Build, tag, and push all Docker images to Amazon ECR
       env:
         IMAGE_TAG: ${{ github.sha }}
         ECR_REGISTRY: "058264317535.dkr.ecr.us-east-1.amazonaws.com"  # ECR 레지스트리 URL을 코드에 직접 포함
