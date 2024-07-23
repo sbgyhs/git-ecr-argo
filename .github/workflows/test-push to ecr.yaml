@@ -14,17 +14,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Set up AWS CLI
+        uses: aws-actions/setup-aws-cli@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # 직접 지역 값을 설정
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Log in to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          region: us-east-1  # 직접 지역 값을 설정
+        run: aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
       - name: Build and Push Docker Images
         run: |
@@ -33,7 +29,7 @@ jobs:
           find "Collection of Dockerfiles" -type f -name 'Dockerfile.*'
           
           # Process each Dockerfile
-          for DOCKERFILE in $(find "Collection of Dockerfiles" -type f -name 'Dockerfile.*'); do
+          while IFS= read -r DOCKERFILE; do
             # Debug: Print the Dockerfile path
             echo "Processing Dockerfile: $DOCKERFILE"
             
@@ -46,14 +42,14 @@ jobs:
             echo "Image name: $IMAGE_NAME"
             
             # Build the Docker image
-            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG -f "$DOCKERFILE" .
+            docker build -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG" -f "$DOCKERFILE" .
             
             # Push the Docker image to ECR
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG
+            docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG"
             
             # Optionally, set output variable for subsequent steps
             echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG" >> $GITHUB_ENV
-          done
+          done < <(find "Collection of Dockerfiles" -type f -name 'Dockerfile.*')
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
