@@ -15,9 +15,9 @@ spec:
             curl -LO "https://dl.k8s.io/release/v1.25.0/bin/linux/amd64/kubectl" && \
             chmod +x ./kubectl && \
             mv ./kubectl /usr/local/bin/kubectl && \
-            PASSWORD=$(aws ecr get-login-password --region us-east-1) && \
+            PASSWORD=$(aws ecr get-login-password --region ap-northeast-2) && \
             kubectl create secret docker-registry ecr-secret \
-              --docker-server=058264317535.dkr.ecr.us-east-1.amazonaws.com \
+              --docker-server=058264317535.dkr.ecr.ap-northeast-2.amazonaws.com \
               --docker-username=AWS \
               --docker-password=$PASSWORD \
               --dry-run=client -o yaml | kubectl apply -f -
@@ -44,7 +44,7 @@ metadata:
 spec:
   containers:
   - name: private-repo-test
-    image: 058264317535.dkr.ecr.us-east-1.amazonaws.com/skylo-ecr:oracle-86cdc5e7e068c63065d981f030fa52f5d17ffb70
+    image: 058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:server-3cd48dd85d72488a6c63b7985770cf12adf193cf
     resources:
       limits:
         memory: "64Mi"
