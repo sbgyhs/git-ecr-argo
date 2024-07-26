@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd
+  labels:
+    app: argocd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: argocd
+  template:
+    metadata:
+      labels:
+        app: mario
+    spec:
+      containers:
+      - name: argocd
+        image: argoproj/argocd:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd
+spec:
+  selector:
+    app: argocd
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer

@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.11
+    environment:
+      MYSQL_ROOT_PASSWORD: 4321
+      MYSQL_DATABASE: webbookdb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 4321
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+  server:
+    build: ./server
+    environment:
+      APP_PORT: 3000
+      DATABASE_URL: "mysql://root:4321@db:3306/webbookdb"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  webapp:
+    build: ./webapp
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+
+volumes:
+  db-data:
