@@ -11,10 +11,11 @@ spec:
         command: ["sh", "-c"]
         args:
           - |
-            yum install -y curl && \
+            apk add --no-cache curl && \
             curl -LO "https://dl.k8s.io/release/v1.25.0/bin/linux/amd64/kubectl" && \
             chmod +x ./kubectl && \
             mv ./kubectl /usr/local/bin/kubectl && \
+            kubectl version --client && \
             PASSWORD=$(aws ecr get-login-password --region ap-northeast-2) && \
             kubectl create secret docker-registry ecr-secret \
               --docker-server=058264317535.dkr.ecr.ap-northeast-2.amazonaws.com \
@@ -33,6 +34,7 @@ spec:
               name: aws-credentials
               key: aws_secret_access_key
       restartPolicy: Never
+
 
 ---
 apiVersion: v1
