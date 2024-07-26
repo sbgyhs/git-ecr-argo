@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+data:
+  # Argo CD의 외부 URL (선택 사항). SSO 구성 시 필요
+  url: https://argo-cd-demo.argoproj.io
+  
+  # 애플리케이션 상태 배지 기능 활성화
+  statusbadge.enabled: "true"
+
+  # 익명 사용자 접근 허용. 익명 사용자는 argocd-rbac-cm.yaml에 지정된 기본 역할 권한을 받습니다.
+  users.anonymous.enabled: "false"
+
+  # 세션 토큰 만료 시간 지정
+  users.session.duration: "24h"
+
+  # 비밀번호 정규 표현식 지정
+  passwordPattern: "^.{8,32}$"
+
+  # Kustomize 빌드 옵션 활성화
+  kustomize.buildOptions: --load_restrictor none
+
+  # Helm 값 파일 스킴
+  helm.valuesFileSchemes: http, https
