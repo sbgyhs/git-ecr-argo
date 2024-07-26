@@ -24,4 +24,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Command to run the app
-CMD ["node", "build/index.js"]
+CMD ["node", "Collection_of_Dockerfiles/server/build/index.js"]
