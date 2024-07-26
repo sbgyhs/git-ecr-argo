@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the Prisma schema and generate Prisma client
-COPY server/prisma/schema.prisma ./prisma
+COPY C:/Users/COM/git-ecr-argo/Collection_of_Dockerfiles/server/prisma ./prisma
 RUN npx prisma generate
 
 # Copy the rest of the application code
