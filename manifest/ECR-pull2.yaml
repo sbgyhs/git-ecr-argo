@@ -44,7 +44,7 @@ metadata:
 spec:
   containers:
   - name: private-repo-test
-    image: 058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:webapp-533fc13689817c1b2ff0015687c096e556e8d0f2
+    image: 058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:webapp-63ca84eb0c758562d7bce846b9866b343d65d2e1
     resources:
       limits:
         memory: "64Mi"
