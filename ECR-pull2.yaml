@@ -21,6 +21,7 @@ spec:
               --docker-username=AWS \
               --docker-password=$PASSWORD \
               --dry-run=client -o yaml | kubectl apply -f -
+              
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:

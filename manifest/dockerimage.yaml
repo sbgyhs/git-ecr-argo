@@ -1,0 +1,47 @@
+# Secret to store GitHub username and token
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-credentials
+  namespace: default
+data:
+  github-username: c2JneWhz
+  github-token: Z2hwX2gyM2JsZ0x3cG1RWGhvakVaZTRyOHFBUEhVaW5qMTNicDg3Zg==
+
+---
+
+# Job to create GHCR credentials Secret
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-ghcr-credentials-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: create-ghcr-credentials
+        image: alpine:3.12
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            apk add --no-cache curl && \
+            USERNAME=$(echo -n "$GITHUB_USERNAME" | base64 -d) && \
+            TOKEN=$(echo -n "$GITHUB_TOKEN" | base64 -d) && \
+            AUTH=$(echo -n "$USERNAME:$TOKEN" | base64) && \
+            echo "{\"auths\":{\"ghcr.io\":{\"auth\":\"$AUTH\"}}}" > /dockerconfigjson && \
+            kubectl create secret generic ghcr-credentials \
+              --from-file=.dockerconfigjson=/dockerconfigjson \
+              --type=kubernetes.io/dockerconfigjson \
+              --dry-run=client -o yaml | kubectl apply -f -
+        env:
+        - name: GITHUB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: github-credentials
+              key: github-username
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github-credentials
+              key: github-token
+      restartPolicy: Never
