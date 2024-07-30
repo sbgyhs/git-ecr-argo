@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: server-deployment
+  name: was-deployment
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
-      app: server
+      app: was
   template:
     metadata:
       labels:
-        app: server
+        app: was
     spec:
       containers:
-      - name: server
+      - name: was
         image: 058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:server-f28508e91412ec436ae43c4c8564a23450751331
         resources:
           limits:
             memory: "64Mi"
             cpu: "0.2"
         ports:
-        - containerPort: 8080
+        - containerPort: 80
       imagePullSecrets:
       - name: aws-credentials
         
