@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: private-repo-test-deployment
+  name: server-deployment
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: private-repo-test
+      app: server
   template:
     metadata:
       labels:
-        app: private-repo-test
+        app: server
     spec:
       containers:
-      - name: private-repo-test
+      - name: server
         image: 058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:server-63ca84eb0c758562d7bce846b9866b343d65d2e1
         resources:
           limits:
@@ -23,3 +23,4 @@ spec:
         - containerPort: 80
       imagePullSecrets:
       - name: aws-credentials
+        
