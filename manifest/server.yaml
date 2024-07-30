@@ -46,4 +46,4 @@ spec:
     ports:
       - containerPort: 80
   imagePullSecrets:
-  - name: 
+  - name: aws-credentials
