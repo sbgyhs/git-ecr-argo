@@ -11,9 +11,7 @@ spec:
         command: ["sh", "-c"]
         args:
           - |
-            
-            PASSWORD=$(aws ecr get-login-password --region ap-northeast-2) && \
-            
+            PASSWORD=$(aws ecr get-login-password --region ap-northeast-2)
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
