@@ -1,12 +1,12 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: ecr-login-job
+  name: server-login-job
 spec:
   template:
     spec:
       containers:
-      - name: ecr-login
+      - name: server-login
         image: amazon/aws-cli:latest
         command: ["sh", "-c"]
         args:
