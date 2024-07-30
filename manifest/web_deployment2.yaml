@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: web
-      image: 058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:webapp-63ca84eb0c758562d7bce846b9866b343d65d2e1
+      image: 058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:webapp-f28508e91412ec436ae43c4c8564a23450751331
       resources:
         limits:
           memory: "64Mi"
