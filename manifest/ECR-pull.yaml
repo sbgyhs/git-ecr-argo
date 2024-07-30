@@ -11,17 +11,9 @@ spec:
         command: ["sh", "-c"]
         args:
           - |
-            apk add --no-cache curl && \
-            curl -LO "https://dl.k8s.io/release/v1.25.0/bin/linux/amd64/kubectl" && \
-            chmod +x ./kubectl && \
-            mv ./kubectl /usr/local/bin/kubectl && \
-            kubectl version --client && \
+            
             PASSWORD=$(aws ecr get-login-password --region ap-northeast-2) && \
-            kubectl create secret docker-registry ecr-secret \
-              --docker-server=058264317535.dkr.ecr.ap-northeast-2.amazonaws.com \
-              --docker-username=AWS \
-              --docker-password=$PASSWORD \
-              --dry-run=client -o yaml | kubectl apply -f -
+            
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
@@ -56,4 +48,4 @@ spec:
     ports:
       - containerPort: 80
   imagePullSecrets:
-  - name: ecr-secret
+  - name: 
