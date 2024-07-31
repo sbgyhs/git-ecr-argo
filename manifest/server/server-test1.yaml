@@ -12,8 +12,15 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - >
-            LATEST_IMAGE=$(aws ecr list-images --repository-name skylo-ecr --query 'sort_by(imageIds,&imagePushedAt)[-1].imageTag' --output text --region ap-northeast-2);
-            kubectl patch deployment server-deployment -p "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"was\",\"image\":\"058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:server-$LATEST_IMAGE\"}]}}}}"
+            # Fetch the latest image tag from ECR
+            LATEST_IMAGE=$(aws ecr list-images --repository-name skylo-ecr --query 'sort_by(imageIds,&imageTag)[-1].imageTag' --output text --region ap-northeast-2);
+            # Check if the latest image tag is not empty
+            if [ -z "$LATEST_IMAGE" ]; then
+              echo "No image tags found in ECR.";
+              exit 1;
+            fi;
+            # Patch the deployment with the latest image tag
+            kubectl patch deployment server-deployment --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value": "058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:$LATEST_IMAGE"}]'
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
@@ -28,3 +35,31 @@ spec:
         - name: AWS_DEFAULT_REGION
           value: "ap-northeast-2"
       restartPolicy: OnFailure
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: was
+  template:
+    metadata:
+      labels:
+        app: was
+    spec:
+      containers:
+      - name: was
+        image: 058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:placeholder # 초기값 설정
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "0.2"
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: aws-credentials
