@@ -8,7 +8,7 @@ spec:
     namespace: argocd
     server: 'https://kubernetes.default.svc'
   source:
-    path: manifest
+    path: manifest/server
     repoURL: 'git@github.com:kosa-skylo/demo-repository.git'
     targetRevision: HEAD
   sources: []
