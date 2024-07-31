@@ -25,12 +25,38 @@ jobs:
       with:
         region: ap-northeast-2  # 직접 지역 값을 설정
 
-    - name: Build, tag, and push all Docker images to Amazon ECR
+name: Build, Tag, and Push Docker Images to Amazon ECR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Log in to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        region: ap-northeast-2
+
+    - name: Build, tag, and push Docker images to Amazon ECR
       env:
         IMAGE_TAG: ${{ github.sha }}
-        BUILD_NUMBER: ${{ github.run_number }}
-        ECR_REGISTRY: "058264317535.dkr.ecr.ap-northeast-2.amazonaws.com"  # ECR 레지스트리 URL을 코드에 직접 포함
-        ECR_REPOSITORY: "skylo-ecr"  # ECR 리포지토리 이름을 코드에 직접 포함
+        ECR_REGISTRY: "058264317535.dkr.ecr.ap-northeast-2.amazonaws.com"
+        ECR_REPOSITORY: "skylo-ecr"
       run: |
         # Find all Dockerfile.* files and process them
         for DOCKERFILE in $(find "Collection_of_Dockerfiles" -type f -name 'Dockerfile.*'); do
@@ -41,27 +67,17 @@ jobs:
           echo "Processing Dockerfile: $DOCKERFILE"
           
           # Build the Docker image
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG-$BUILD_NUMBER -f $DOCKERFILE .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG -f $DOCKERFILE .
           
           # Tag the Docker image with 'latest'
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG-$BUILD_NUMBER $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-latest
-          
-          # Push the Docker image with the build number tag
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG-$BUILD_NUMBER
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-latest
           
           # Push the Docker image with the 'latest' tag
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-latest
           
           # Optionally, set output variable for subsequent steps
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG-$BUILD_NUMBER" >> $GITHUB_ENV
           echo "latest_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-latest" >> $GITHUB_ENV
-        done < <(find "Collection_of_Dockerfiles" -type f -name 'Dockerfile.*')
+        done
 
-    env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      ECR_REGISTRY: "058264317535.dkr.ecr.ap-northeast-2.amazonaws.com"  # ECR 레지스트리 URL을 코드에 직접 포함
-      ECR_REPOSITORY: "skylo-ecr"
-      IMAGE_TAG: ${{ github.sha }}
-      BUILD_NUMBER: ${{ github.run_number }}
 
 
