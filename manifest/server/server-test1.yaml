@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: was
-        image: 058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:latest
+        image: server-latest
         imagePullPolicy: Always
         resources:
           limits:
