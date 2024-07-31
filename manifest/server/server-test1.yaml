@@ -12,9 +12,8 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - >
-            yum install -y aws-cli jq;
             LATEST_IMAGE=$(aws ecr list-images --repository-name skylo-ecr --query 'sort_by(imageIds,&imagePushedAt)[-1].imageTag' --output text --region ap-northeast-2);
-            kubectl create secret generic latest-image --from-literal=image=$LATEST_IMAGE --dry-run=client -o yaml | kubectl apply -f -
+            kubectl patch deployment server-deployment -p "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"was\",\"image\":\"058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:server-$LATEST_IMAGE\"}]}}}}"
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
@@ -29,31 +28,3 @@ spec:
         - name: AWS_DEFAULT_REGION
           value: "ap-northeast-2"
       restartPolicy: OnFailure
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: server-deployment
-  namespace: default
-spec:
-  replicas: 4
-  selector:
-    matchLabels:
-      app: was
-  template:
-    metadata:
-      labels:
-        app: was
-    spec:
-      containers:
-      - name: was
-        image: 058264317535.dkr.ecr.ap-northeast-2.amazonaws.com/skylo-ecr:server-$(LATEST_IMAGE)
-        resources:
-          limits:
-            memory: "64Mi"
-            cpu: "0.2"
-        ports:
-        - containerPort: 80
-      imagePullSecrets:
-      - name: aws-credentials
